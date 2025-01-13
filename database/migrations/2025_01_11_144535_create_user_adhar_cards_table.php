@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->string('name');
             $table->string('aadhar_number')->unique();
+            $table->string('masked_aadhar_number');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

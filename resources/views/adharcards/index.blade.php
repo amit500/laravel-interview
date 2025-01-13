@@ -23,10 +23,10 @@
                             <td>{{ $card->name }}</td>
                             <td>
                                 <?php
-                                    $aadharNumber = base64_decode($card->aadhar_number);
-                                    $maskedAadharNumber = 'XXXX-XXXX-' . substr($aadharNumber, -4);
+                                    // $aadharNumber = base64_decode($card->aadhar_number);
+                                    // $maskedAadharNumber = 'XXXX-XXXX-' . substr($aadharNumber, -4);
                                 ?>
-                                {{ $maskedAadharNumber }}
+                                {{ $card->masked_aadhar_number }}
                             </td>
                             
                             <td>

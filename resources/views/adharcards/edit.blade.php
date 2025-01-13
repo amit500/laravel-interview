@@ -20,7 +20,7 @@
 
             <div class="mb-3">
                 <label for="aadhar_number" class="form-label">Aadhar Number</label>
-                <input type="text" name="aadhar_number" id="aadhar_number" class="form-control" placeholder="Enter your Aadhar number" value="{{ 'XXXX-XXXX-' . substr(base64_decode($card->aadhar_number), -4) }}" required>
+                <input type="text" name="aadhar_number" id="aadhar_number" class="form-control" placeholder="Enter your Aadhar number" value="{{ $card->masked_aadhar_number }}" required>
                 @error('aadhar_number')
                     <div class="text-danger">{{ $message }}</div>
                 @enderror

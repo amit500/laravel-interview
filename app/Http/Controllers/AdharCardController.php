@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\UserAdharCard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdharCardController extends Controller
 {
@@ -30,23 +31,27 @@ class AdharCardController extends Controller
                 'regex:/^\d{4}-\d{4}-\d{4}$/',
                 function ($attribute, $value, $fail) {
                     $pureAadharNumber = str_replace('-', '', $value);
-                    $existingCard = UserAdharCard::where('aadhar_number', base64_encode($pureAadharNumber))->first();
+                    $cards = UserAdharCard::where('user_id', auth()->id())->get();
 
-                    if ($existingCard) {
-                        $fail('The Aadhar number has already been taken.');
+                    foreach ($cards as $card) {
+                        if (Hash::check($pureAadharNumber, $card->aadhar_number)) {
+                            $fail('The Aadhar number already exists.');
+                            return;
+                        }
                     }
                 },
             ],
         ]);
 
         $pureAadharNumber = str_replace('-', '', $request->aadhar_number);
-
-        $encodedAadharNumber = base64_encode($pureAadharNumber);
+        $hashedAadharNumber = Hash::make($pureAadharNumber);
+        $maskedAadharNumber = 'XXXX-XXXX-' . substr($pureAadharNumber, -4);
 
         UserAdharCard::create([
             'user_id' => Auth::id(),
             'name' => $request->name,
-            'aadhar_number' => $encodedAadharNumber,
+            'aadhar_number' => $hashedAadharNumber,
+            'masked_aadhar_number' => $maskedAadharNumber,
         ]);
 
         return redirect()->route('adhar.list')->with(['success' => 'Aadhar card details saved successfully']);
@@ -66,12 +71,13 @@ class AdharCardController extends Controller
                 'regex:/^\d{4}-\d{4}-\d{4}$/',
                 function ($attribute, $value, $fail) use ($id) {
                     $pureAadharNumber = str_replace('-', '', $value);
-                    $existingCard = UserAdharCard::where('aadhar_number', base64_encode($pureAadharNumber))
-                        ->where('id', '!=', $id)
-                        ->first();
+                    $cards = UserAdharCard::where('user_id', auth()->id())->where('id', '!=', $id)->get();
 
-                    if ($existingCard) {
-                        $fail('The Aadhar number has already been taken.');
+                    foreach ($cards as $card) {
+                        if (Hash::check($pureAadharNumber, $card->aadhar_number)) {
+                            $fail('The Aadhar number already exists.');
+                            return;
+                        }
                     }
                 },
             ],
@@ -80,12 +86,14 @@ class AdharCardController extends Controller
         $card = UserAdharCard::findOrFail($id);
 
         $pureAadharNumber = str_replace('-', '', $request->aadhar_number);
-
-        $encodedAadharNumber = base64_encode($pureAadharNumber);
+        $hashedAadharNumber = Hash::make($pureAadharNumber);
+        $maskedAadharNumber = 'XXXX-XXXX-' . substr($pureAadharNumber, -4);
+        // $encodedAadharNumber = base64_encode($pureAadharNumber);
 
         $card->update([
             'name' => $request->name,
-            'aadhar_number' => $encodedAadharNumber,
+            'aadhar_number' => $hashedAadharNumber,
+            'masked_aadhar_number' => $maskedAadharNumber,
         ]);
 
         session()->flash('success', 'Aadhar card details updated successfully.');

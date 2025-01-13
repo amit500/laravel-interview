@@ -9,5 +9,5 @@ class UserAdharCard extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'name', 'aadhar_number'];
+    protected $fillable = ['user_id', 'name', 'aadhar_number', 'masked_aadhar_number'];
 }
